@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-microservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      tier: backend
+  template:
+    metadata:
+      labels:
+        tier: backend
+    spec:
+      containers:
+      - name: echo-container
+        image: hashicorp/http-echo:latest
+        args:
+          - "-text=DATABASE RESPONSE: Connection successful. Fetching user profile data..."
+        ports:
+        - containerPort: 5678
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-internal-phone
+spec:
+  selector:
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 80         # The internal phone extension number
+      targetPort: 5678 # The port the container listens on
+  type: ClusterIP      # Keeps it private and hidden from the internet
